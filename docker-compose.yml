@@ -1,0 +1,31 @@
+version: '2.0'
+services:
+  shared-node-modules:
+    image: myapp:1.0.0
+    container_name: shared-node-modules
+    command: npm install --only=production
+    volumes:
+      - shared-volume:/app/node_modules
+
+  app1:
+    image: myapp:1.0.0
+    container_name: app1
+    # wait 3 seconds to let shared-node-modules finished npm install
+    command: sh -c "sleep 3; npm start"
+    volumes_from:
+      - shared-node-modules:ro
+    ports:
+      - "3001:3000"
+
+  app2:
+    image: myapp:1.0.0
+    container_name: app2
+    # wait 3 seconds to let shared-node-modules finished npm install
+    command: sh -c "sleep 3; npm start"
+    volumes_from:
+      - shared-node-modules:ro
+    ports:
+      - "3002:3000"
+
+volumes:
+  shared-volume:
